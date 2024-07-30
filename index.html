@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BBS SMP</title>
+        <meta name="description" content="Um site de SMP dos mano fudido">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/src/style.css">
+    </head>
+    <body>        
+        <div class="bg">
+            <img src="ass/assets/Logo.png" width="650px"></img>
+            <br style="margin-bottom: 10px;"></br>
+            <div style="
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            gap: 20px;
+            background-color: rgba(0, 0, 0, 0.281);
+            padding: 20px;
+            box-shadow: 3px 3px #00000070;
+            backdrop-filter: blur(3px);
+            ">
+                <p1 class="cooldown" id="statuss">Carregando status...</p1>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="ass/assets/steve.png" alt="" width="32px" height="32px">
+                    <p class="PlayerAmount" id="playeramount">0/0</p>
+                </div>
+            </div>
+            <br style="margin-bottom: 10px;"></br>
+            <div style="display: flex; gap: 20px;">
+                <button class="copyIPButton" onclick="basicCopy('sadstysmp.aternos.me:15352')">Copiar IP - JAVA</button>
+            </div>
+        </div>
+
+        <p1 style="
+        color:rgb(204, 204, 204);
+        font-weight: 700;
+        font-size: 40px;
+        text-shadow: 3px 3px #ffffff36;
+        ">Lista de jogadores</p1>
+        <br>
+        <p1 style="
+        color:rgb(204, 204, 204);
+        font-weight: 900;
+        font-size: 95px;
+        text-shadow: 3px 3px #ffffff36;
+        ">ONLINE</p1>
+        <br>
+        <p1 style="
+         color:rgba(204, 204, 204, 0.452);
+         font-weight: 200;
+         font-size: 95px;
+         ">___________</p1>
+        <div class="playerlist" id="list">
+            <!--
+            <div id="playerDiv">
+                <img src="res/assets/steve.png" alt="" width="65px" height="65px">
+                <div>
+                    <p style="
+                    color:rgb(204, 204, 204);
+                    font-weight: 900;
+                    font-size: 35px;
+                    text-shadow: 3px 3px #ffffff36;
+                    ">StevePuto_</p>
+                </div>
+            </div>
+        -->
+        </div>
+        <script src="" async defer></script>
+    </body>
+    <script>
+        const xhr = new XMLHttpRequest();
+
+        const apiUrl = 'https://api.mcstatus.io/v2/status/java/sadstysmp.aternos.me';
+        const apiAltUrl = 'https://api.mcstatus.io/v2/status/java/sadstysmp.aternos.me:15352';
+        let currentURL = apiUrl
+
+        function ReattemptIsSucessful() {
+            if (currentURL == apiAltUrl) { return false }
+
+            currentURL = apiAltUrl
+            xhr.open('GET', currentURL);
+            xhr.send();
+            return true
+        }
+
+        function displayPlayerDisplayer(playerElement) {
+            let playerDiv_ = document.createElement("div");
+                playerDiv_.setAttribute('id', 'playerDiv')
+                document.getElementById("list").appendChild(playerDiv_)
+    
+                let playerIcon = document.createElement("img");
+                playerDiv_.appendChild(playerIcon)
+                playerIcon.setAttribute('src', 'ass/assets/steve.png')
+                playerIcon.setAttribute('width', '65px')
+                            
+                let divInside = document.createElement("div");
+                playerDiv_.appendChild(divInside)
+                playerDiv_.style = "text-align: left;"
+    
+                let playerText = document.createElement("p");
+                divInside.appendChild(playerText)
+                playerText.innerHTML = playerElement.name_clean
+                playerText.style = " color:rgb(204, 204, 204); font-weight: 900; font-size: 35px; text-shadow: 3px 3px #ffffff36;"
+                    
+                let playerPlatform = document.createElement("p");
+                divInside.appendChild(playerPlatform)
+                if (playerElement.name_clean.startsWith(".")) {playerPlatform.innerHTML = "Bedrock Edition"} else {playerPlatform.innerHTML = "Java Edition"}
+                           
+                playerPlatform.style = " color:rgba(204, 204, 204, .5); font-weight: 500; font-size: 18px; text-shadow: 3px 3px 5px #00000069;"
+        }
+
+        function displayServer_ON(jsonData) {
+            if (jsonData.players.max == 0) { displayServer_OFF(); return }
+
+            document.getElementById("statuss").innerHTML = "Servidor está aberto!"
+            document.getElementById("statuss").style = "color: rgb(185,252,185)"
+            document.getElementById("playeramount").innerHTML = jsonData.players.online + '/' + jsonData.players.max
+                        
+            jsonData.players.list.forEach(player => {
+                displayPlayerDisplayer(player)
+            });
+        }
+
+        function displayServer_OFF(jsonData) {
+            if (ReattemptIsSucessful()) { return }
+
+            document.getElementById("statuss").style = "color: rgb(252,185,185)"
+            document.getElementById("statuss").innerHTML = "Servidor está fechado..."
+        }
+
+        window.onload = function () {
+
+            xhr.onreadystatechange = function() {
+                if (!(this.readyState == 4 && this.status == 200)) { return }
+                
+                const data = JSON.parse(xhr.responseText);
+
+                if (data.online) { displayServer_ON(data) } else { displayServer_OFF(data) }
+            };
+            
+            xhr.open('GET', currentURL);
+            xhr.send();
+            
+        };
+
+        function basicCopy(textToCopy) {
+            navigator.clipboard.writeText(textToCopy);
+        }
+        </script>
+</html>
